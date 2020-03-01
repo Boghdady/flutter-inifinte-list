@@ -16,7 +16,14 @@ class PostUninitialized extends PostState {}
   PostError- will tell the presentation layer that an error
   has occurred while fetching posts
  */
-class PostError extends PostState {}
+class PostError extends PostState {
+  final String errorMsg;
+
+  PostError(this.errorMsg);
+
+  @override
+  List<Object> get props => [errorMsg];
+}
 
 /*
   Will tell the presentation layer it has content to render,

@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
         }
         if (state is PostError) {
           return Center(
-            child: Text('failed to fetch posts'),
+            child: Text(state.errorMsg),
           );
         }
         if (state is PostLoaded) {

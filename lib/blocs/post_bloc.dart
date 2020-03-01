@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:bloc/bloc.dart';
+import 'package:flutter_infinite_list/utils/check_internet_connection.dart';
 import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_infinite_list/models/post.dart';
+import 'package:flutter_infinite_list/utils/exceptions.dart';
 
 part 'post_event.dart';
 part 'post_state.dart';
@@ -38,8 +40,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
                   hasReachedMax: false,
                 );
         }
+      } on NoInternetConnectionException catch (e) {
+        yield PostError(e.toString());
       } catch (_) {
-        yield PostError();
+        yield PostError('failed to fetch posts');
       }
     }
   }
@@ -48,6 +52,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       state is PostLoaded && state.hasReachedMax;
 
   Future<List<Post>> _fetchPosts(int startIndex, int limit) async {
+    await checkInternetConnection();
     final response = await httpClient.get(
         'https://jsonplaceholder.typicode.com/posts?_start=$startIndex&_limit=$limit');
     if (response.statusCode == 200) {
